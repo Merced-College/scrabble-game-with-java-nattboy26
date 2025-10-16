@@ -1,5 +1,5 @@
 /*
- * Nathanael Obrey & James McKean
+ * Nathanael Obrey & James McKeann
  */
 
 import java.io.File;
@@ -82,6 +82,16 @@ public class ScrabblerGame {
             System.out.println("Please enter a word using these characters: ");
             userWord = userInput.nextLine().toUpperCase().trim();
 
+            // ensure the user only uses the provided characters
+            if (userWord.length() == 0) {
+                System.out.println("You must enter a word. Try again.");
+                continue;
+            }
+            if (!usesOnlyGivenLetters(userWord, chars)) {
+                System.out.println("Your word uses letters not in the given characters or uses a letter too many times. Try again.");
+                continue;
+            }
+
             //check if the word is in the dictionary using binary search
             index = binarySearch(dictionary, userWord);
             if (index != -1) {
@@ -112,5 +122,24 @@ public class ScrabblerGame {
             }
         }
         return -1; // not found
+    }
+
+    //check that the target word can be constructed from the given characters (respecting counts)
+    public static boolean usesOnlyGivenLetters(String target, String[] chars) {
+        int[] counts = new int[26];
+        for (String c : chars) {
+            if (c != null && c.length() > 0) {
+                counts[c.charAt(0) - 'A']++;
+            }
+        }
+
+        for (int i = 0; i < target.length(); i++) {
+            char ch = target.charAt(i);
+            if (ch < 'A' || ch > 'Z') return false; // only allow A-Z
+            int idx = ch - 'A';
+            counts[idx]--;
+            if (counts[idx] < 0) return false; // used more times than available
+        }
+        return true;
     }
 }
